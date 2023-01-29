@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="~{/admin/home::admin-header(~{::title})}">
+    <title>Admin Account Page</title>
+</head>
+<body class="sb-nav-fixed">
+<nav th:replace="~{/admin/home::navBar}"></nav>
+<div id="layoutSidenav">
+    <div th:replace="~{/admin/home::navSide}"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Danh sách người dùng</h1>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#exampleModalAdd">
+                            Thêm mới
+                        </button>
+                        <p th:if="${param.error!= null}">Thêm người dùng lỗi</p>
+                        <p th:if="${param.success!= null}">Thêm người dùng thành công</p>
+                        <!-- Modal Add-->
+                        <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Thêm mới</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form th:action="@{/admin/account/create}" th:object="${user}" method="post"
+                                              enctype="multipart/form-data">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="fullname"
+                                                           class="col-form-label">Name:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="fullname" th:field="*{fullName}" required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="email"
+                                                           class="col-form-label">Email:</label>
+                                                    <input type="email" class="form-control"
+                                                           id="email" th:field="*{email}" required>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="addphone"
+                                                           class="col-form-label">Số điện thoại:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="addphone" th:field="*{phoneNumber}" name="phoneNumber"
+                                                           required>
+                                                    <p th:if="${#fields.hasErrors('phoneNumber')}"></p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="address"
+                                                           class="col-form-label">Địa chỉ:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="address" th:field="*{address}" name="address" required>
+                                                    <p th:if="${#fields.hasErrors('address')}"></p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="username"
+                                                           class="col-form-label">Tài khoản:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="username" th:field="*{username}" name="username"
+                                                           required>
+                                                    <p th:if="${#fields.hasErrors('username')}"></p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="password"
+                                                           class="col-form-label">Mật khẩu:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="password" th:field="*{password}" name="password"
+                                                           required>
+                                                    <p th:if="${#fields.hasErrors('password')}"></p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="role" class="col-form-label">Vai trò:
+                                                        <select
+                                                                class="form-control" id="role" th:field="*{role}"
+                                                                required>
+                                                            <option value="ADMIN">ADMIN</option>
+                                                            <option value="USER">USER</option>
+                                                        </select>
+                                                    </label>
+
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Đóng
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">Thêm</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End Modal Add-->
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/account}" method="get">
+                            <label for="size" class="px-2">
+                                Số lượng mỗi trang:
+                                <select name="size" id="size">
+                                    <option value="5" selected>Chọn số lượng</option>
+                                    <option >3</option>
+                                    <option >5</option>
+                                    <option >7</option>
+                                </select>
+                            </label>
+                            <button class="btn btn-success my-3" type="submit">Set</button>
+                        </form>
+                        <table id="datatablesSimple" class="table">
+                            <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Địa chỉ</th>
+                                <th>Tài khoản</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            <th:block th:each="user : ${pageConfig.ts}">
+                                <tr>
+                                    <td th:text="${user.fullName}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td th:text="${user.phoneNumber}"></td>
+                                    <td th:text="${user.address}"></td>
+                                    <td th:text="${user.username}"></td>
+                                    <td th:text="${user.role}"></td>
+                                    <td th:if="${user.status == 1}" style="color: green;font-weight: bold">Hoạt động
+                                    </td>
+                                    <td th:if="${user.status == 0}" style="color: red;font-weight: bold">Khóa</td>
+                                    <td style="width : 270px; ">
+                                        <button type="button" style="width: 80px" class="btn btn-success"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#idModelMail'+${user.id}">
+                                            Gửi
+                                        </button>
+                                        <button type="button" style="width: 80px" class="btn btn-primary"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#exampleModal'+${user.id}">
+                                            Sửa
+                                        </button>
+                                        <button type="button" style="width: 80px" class="btn btn-warning"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#idModelDetail'+${user.id}">
+                                            Chi tiết
+                                        </button>
+                                        <button type="button" style="width: 80px" class="btn btn-danger mt-1"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#idModelDel'+${user.id}">
+                                            Xóa
+                                        </button>
+                                        <form th:if="${user.status == 1}" th:action="@{/admin/account/lock/{id}(id=${user.id})}" method="post"
+                                              style="margin-left: 85px;margin-top: -38px">
+                                            <button type="submit" style="width: 80px" class="btn btn-danger">
+                                                Khóa
+                                            </button>
+                                        </form>
+                                        <form th:if="${user.status == 0}" th:action="@{/admin/account/un-lock/{id}(id=${user.id})}" method="post">
+                                            <button type="submit" style="width: 80px" class="btn btn-success">
+                                                Mở
+                                            </button>
+                                        </form>
+                                        <div class="modal fade" th:id="'idModelDel' + ${user.id}" tabindex="-1"
+                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Bạn chắc chắn
+                                                            muốn xóa ?</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Người dùng : <span th:text="${user.fullName}"></span>
+                                                        <form th:action="@{/admin/account/delete/{id}(id=${user.id})}" method="post">
+                                                            <div class="modal-footer" style="margin-top: 20px">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">Đóng
+                                                                </button>
+                                                                <button type="submit" class="btn btn-danger">Xóa
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" th:id="'idModelMail' + ${user.id}" tabindex="-1"
+                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Gửi đến: <span
+                                                                th:text="${user.email}"></span></h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form th:action="@{/ql-user/send-mail}" method="post">
+                                                            <input type="hidden" class="form-control" id="id"
+                                                                   name="idUser" th:value="${user.id}">
+                                                            <label for="addname"
+                                                                   class="col-form-label">Nội dung:</label>
+                                                            <textarea rows="10" class="form-control"
+                                                                      id="addname" name="note"></textarea>
+                                                            <div class="modal-footer" style="margin-top: 20px">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-bs-dismiss="modal">
+                                                                    Đóng
+                                                                </button>
+                                                                <button type="submit" class="btn btn-success">Gửi
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" th:id="'idModelDetail' + ${user.id}" tabindex="-1"
+                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Chi tiết : <span
+                                                                th:text="${user.fullName}"></span></h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-6"><h5>Họ tên :</h5>
+                                                                <p th:text="${user.fullName}"></p>
+                                                                <h5>Email:</h5>
+                                                                <p th:text="${user.email}"></p>
+                                                                <h5>Số điện thoại:</h5>
+                                                                <p th:text="${user.phoneNumber}"></p>
+                                                                <h5>Tài khoản:</h5>
+                                                                <p th:text="${user.username}"></p></div>
+                                                            <div class="col-6"><h5>Địa chỉ :</h5>
+                                                                <p th:text="${user.address}"></p>
+                                                                <h5>Vai trò:</h5>
+                                                                <p th:text="${user.role}"></p>
+                                                                <h5>Lần đăng nhập gần nhất:</h5>
+                                                                <p th:text="${user.created}"></p>
+                                                                <h5>Note:</h5>
+                                                                <p th:text="${user.note}"></p></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Modal Update-->
+                                <div class="modal fade" th:id="'exampleModal'+${user.id}" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg ">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Cập nhật</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form enctype="multipart/form-data"
+                                                      th:object="${user}"
+                                                      th:action="@{/admin/account/update/{id}(id=${user.id})}"
+                                                      method="post">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="add-name-1"
+                                                                   class="col-form-label">Họ và tên:</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="add-name-1" name="fullName"
+                                                                   th:placeholder="${user.fullName}"
+                                                                   th:field="${user.fullName}"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="addcost"
+                                                                   class="col-form-label">Địa chỉ thư điện tử:</label>
+                                                            <input type="email"
+                                                                   class="form-control"
+                                                                   id="addcost"
+                                                                   name="email"
+                                                                   th:placeholder="${user.email}"
+                                                                   th:value="${user.email}"
+                                                                   readonly
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="add-name"
+                                                                   class="col-form-label">Số điện thoại:</label>
+                                                            <input type="number"
+                                                                   class="form-control"
+                                                                   id="add-name"
+                                                                   name="phoneNumber"
+                                                                   th:placeholder="${user.phoneNumber}"
+                                                                   th:field="${user.phoneNumber}"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="add-cost4"
+                                                                   class="col-form-label">Địa chỉ:</label>
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   id="add-cost4"
+                                                                   name="address"
+                                                                   th:placeholder="${user.address}"
+                                                                   th:field="${user.address}"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="add-name1"
+                                                                   class="col-form-label">Tài khoản:</label>
+                                                            <input readonly type="text" class="form-control"
+                                                                   id="add-name1" name="username" required
+                                                                   th:placeholder="Username+':'+${user.username}"
+                                                                    th:value="${user.username}">
+                                                            <label for="add-name2"
+                                                                   class="col-form-label">Mật khẩu:</label>
+                                                            <input
+                                                                   type="text"
+                                                                   class="form-control"
+                                                                   id="add-name2"
+                                                                   name="password"
+                                                                   required
+                                                                   th:placeholder="Password+':'+${user.password}"
+                                                                   th:value="${user.password}">
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="ct_id" class="col-form-label">Vai trò:</label>
+                                                            <select class="form-control" id="ct_id" name="idRole"
+                                                                    required
+                                                                    th:field="*{role}">
+                                                                <option value="ADMIN">ADMIN</option>
+                                                                <option value="USER">USER</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Đóng
+                                                        </button>
+                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <!--                                            -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal Update-->
+                            </th:block>
+                            </tbody>
+                        </table>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li th:if="${pageConfig.getPage()>1}"
+                                    class="page-item"><a
+                                        class="page-link"
+                                        th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() -1})}">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#"
+                                                         th:text="${pageConfig.getPage()}"></a></li>
+                                <li th:if="${pageConfig.getPage() < pageConfig.getTotalPage()}" class="page-item">
+                                    <a
+                                            class="page-link"
+                                            th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() +1})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--    <footer th:replace="admin/fragments :: footer" class="py-4 bg-light mt-auto">-->
+        <!--    </footer>-->
+    </div>
+</div>
+
+<script th:src="@{/admin1/js/JQuery3.3.1.js}"></script>
+<script th:src="@{'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'}"
+        crossorigin="anonymous"></script>
+<script th:src="@{/admin1/js/scripts.js}"></script>
+<script th:src="@{'https://cdn.jsdelivr.net/npm/simple-datatables@latest'}" crossorigin="anonymous"></script>
+</body>
+
+</html>

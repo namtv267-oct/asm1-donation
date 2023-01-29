@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="~{/admin/home::admin-header(~{::title})}">
+    <title>Donation Page</title>
+</head>
+<body class="sb-nav-fixed">
+<nav th:replace="~{/admin/home::navBar}"></nav>
+<div id="layoutSidenav">
+    <div th:replace="~{/admin/home::navSide}"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Danh sách đợt quyên góp</h1>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#exampleModalAdd">
+                            Thêm mới
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/donation}" method="get">
+                            <label for="size" class="px-2">
+                                Entries per page:
+                                <select name="size" id="size">
+                                    <option value="5" selected>Chọn số lượng:</option>
+                                    <option>3</option>
+                                    <option>5</option>
+                                    <option>7</option>
+                                </select>
+                            </label>
+                            <button class="btn btn-success my-3" type="submit">Set</button>
+                        </form>
+                        <table id="datatablesSimple" class="table">
+                            <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Ngày bắt đầu</th>
+                                <th>Ngày kết thúc</th>
+                                <th>Tổ chức</th>
+                                <th>Số điện thoại</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            <th:block th:each="donation : ${donations}">
+                                <tr>
+                                    <td th:text="${donation.code}"></td>
+                                    <td th:text="${donation.name}"></td>
+                                    <td th:text="${donation.startDate}"></td>
+                                    <td th:text="${donation.endDate}"></td>
+                                    <td th:text="${donation.organizationName}"></td>
+                                    <td th:text="${donation.phoneNumber}"></td>
+                                    <td th:text="${donation.money == null ? 0 : donation.money}"></td>
+                                    <td th:value="${donation.status == 1 ? 'Quyên góp' : 'Dừng quên góp'}"
+                                        style="color: green;font-weight: bold">Hoạt động
+                                    </td>
+                                    <td style="width : 270px">
+                                        <button type="button" style="width: 80px" class="btn btn-primary"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#exampleModal'+${donation.id}">
+                                            Cập nhật
+                                        </button>
+                                        <a type="button" style="width: 80px" class="btn btn-warning"
+                                           th:href="@{/admin/donation/detail/{id}(id=${donation.id})}">
+                                            Chi tiết
+                                        </a>
+                                        <button type="button" style="width: 80px" class="btn btn-danger"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#idModelDel'+${donation.id}">
+                                            Xóa
+                                        </button>
+                                        <form th:action="@{/admin/donation/lock/{id}(id=${donation.id})}"
+                                              method="post">
+                                            <button type="submit" style="width: 80px" class="btn btn-danger">
+                                                Quyên góp
+                                            </button>
+                                        </form>
+                                        <form
+                                                th:action="@{/admin/account/un-lock/{id}(id=${donation.id})}"
+                                                method="post">
+                                            <button type="submit" style="width: 80px" class="btn btn-success">
+                                                Kết thúc
+                                            </button>
+                                        </form>
+                                        <!--                                        <div class="modal fade" th:id="'idModelDetail' + ${donation.id}" tabindex="-1"-->
+                                        <!--                                             aria-labelledby="exampleModalLabel" aria-hidden="true">-->
+                                        <!--                                            <div class="modal-dialog modal-lg">-->
+                                        <!--                                                <div class="modal-content">-->
+                                        <!--                                                    <div class="modal-header">-->
+                                        <!--                                                        <h5 class="modal-title" th:id="exampleModalLabel+${donation.id}">Chi-->
+                                        <!--                                                            tiết : <span-->
+                                        <!--                                                                    th:text="${donation.name}"></span></h5>-->
+                                        <!--                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"-->
+                                        <!--                                                                aria-label="Close"></button>-->
+                                        <!--                                                    </div>-->
+                                        <!--                                                    <div class="modal-body">-->
+                                        <!--                                                        <div class="row">-->
+                                        <!--                                                            <div class="col-6"><h5>Họ tên :</h5>-->
+                                        <!--                                                                <p th:text="${donation.code}"></p>-->
+                                        <!--                                                                <h5>Email:</h5>-->
+                                        <!--                                                                <p th:text="${user.email}"></p>-->
+                                        <!--                                                                <h5>Số điện thoại:</h5>-->
+                                        <!--                                                                <p th:text="${user.phoneNumber}"></p>-->
+                                        <!--                                                                <h5>Tài khoản:</h5>-->
+                                        <!--                                                                <p th:text="${user.username}"></p></div>-->
+                                        <!--                                                            <div class="col-6"><h5>Địa chỉ :</h5>-->
+                                        <!--                                                                <p th:text="${user.address}"></p>-->
+                                        <!--                                                                <h5>Vai trò:</h5>-->
+                                        <!--                                                                <p th:text="${user.role}"></p>-->
+                                        <!--                                                                <h5>Lần đăng nhập gần nhất:</h5>-->
+                                        <!--                                                                <p th:text="${user.created}"></p>-->
+                                        <!--                                                                <h5>Note:</h5>-->
+                                        <!--                                                                <p th:text="${user.note}"></p></div>-->
+                                        <!--                                                        </div>-->
+                                        <!--                                                    </div>-->
+                                        <!--                                                </div>-->
+                                        <!--                                            </div>-->
+                                        <!--                                        </div>-->
+                                    </td>
+                                </tr>
+                                <!--  Model delete-->
+                                <div class="modal fade" th:id="'idModelDel' + ${donation.id}" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title"
+                                                    th:id="exampleModalLabel+${donation.id}">Bạn
+                                                    chắc chắn
+                                                    muốn xóa ?</h5>
+                                                <button type="button" class="btn-close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Người dùng : <span th:text="${donation.name}"></span>
+                                                <form th:action="@{/admin/donation/delete/{id}(id=${donation.id})}"
+                                                      method="post">
+                                                    <div class="modal-footer" style="margin-top: 20px">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Đóng
+                                                        </button>
+                                                        <button type="submit" class="btn btn-danger">Xóa
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal Update-->
+                                <div class="modal fade" th:id="'exampleModal'+${donation.id}" tabindex="-1"
+                                     aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg ">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" th:id="exampleModalLabel+${donation.id}">Cập
+                                                    nhật</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form enctype="multipart/form-data"
+                                                      th:object="${donation}"
+                                                      th:action="@{/admin/donation/update/{id}(id=${donation.id})}"
+                                                      method="post">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="add-name-1"
+                                                                   class="col-form-label">Code:</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="add-name-1" name="fullName"
+                                                                   th:placeholder="${donation.code}"
+                                                                   th:field="*{code}"
+                                                                   th:value="${donation.getCode()}"
+                                                                   required>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="addcost"
+                                                                   class="col-form-label">Tên đợt quyên góp:</label>
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   id="addcost"
+                                                                   name="email"
+                                                                   th:field="*{name}"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="start-date"
+                                                                   class="col-form-label"
+                                                                   th:text="'Ngày bắt đầu: ' +${donation.startDate}"></label>
+                                                            <input type="date"
+                                                                   class="form-control"
+                                                                   id="start-date"
+                                                                   name="endDate"
+                                                                   th:field="*{startDate}"
+                                                                   required
+                                                            >
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="end-date"
+                                                                   class="col-form-label"
+                                                                   th:text="'Ngày kết thúc: ' +${donation.endDate}"></label>
+                                                            <input type="date"
+                                                                   class="form-control"
+                                                                   id="end-date"
+                                                                   name="address"
+                                                                   th:field="*{endDate}"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label for="add-name1"
+                                                                   class="col-form-label">Tổ chức:</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="add-name1"
+                                                                   name="username" required
+                                                                   th:placeholder="${donation.organizationName}"
+                                                                   th:value="${donation.getOrganizationName()}"
+                                                                   th:field="*{organizationName}">
+
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="add-name2"
+                                                                   class="col-form-label">Số điện thoại:</label>
+                                                            <input
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    id="add-name2"
+                                                                    name="password"
+                                                                    required
+                                                                    th:placeholder="${donation.phoneNumber}"
+                                                                    th:field="*{phoneNumber}"
+                                                                    th:value="${donation.getPhoneNumber()}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label for="description-2"
+                                                               class="col-form-label">Nội dung:</label>
+                                                        <textarea class="form-control" th:field="*{description}"
+                                                                  th:value="${donation.getDescription()}"
+                                                                  name="description" id="description-2" required
+                                                        ></textarea>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Đóng
+                                                        </button>
+                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <!--                                            -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal Update-->
+                            </th:block>
+                            </tbody>
+                        </table>
+                        <!-- Modal Add-->
+                        <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Thêm mới</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form th:action="@{/admin/donation/create}" th:object="${donation}"
+                                              method="post"
+                                              enctype="multipart/form-data">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="code"
+                                                           class="col-form-label">Mã đợt quyên góp:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="code" th:field="*{code}" required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="organizationName"
+                                                           class="col-form-label">Tên đợt quyên góp:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="organizationName" th:field="*{organizationName}"
+                                                           required>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="start-day"
+                                                           class="col-form-label">Ngày bắt đầu:</label>
+                                                    <input type="date" class="form-control"
+                                                           id="start-day" th:field="*{startDate}" name="startDate"
+                                                           required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="end-day"
+                                                           class="col-form-label">Địa chỉ:</label>
+                                                    <input type="date" class="form-control"
+                                                           id="end-day" th:field="*{endDate}" name="endDate" required>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="name"
+                                                           class="col-form-label">Tổ chức:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="name" th:field="*{name}" name="name"
+                                                           required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="phone-number"
+                                                           class="col-form-label">Số điện thoại:</label>
+                                                    <input type="text" class="form-control"
+                                                           id="phone-number" th:field="*{phoneNumber}"
+                                                           name="phoneNumber"
+                                                           required>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label for="description" class="col-form-label">Nội dung
+                                                    <textarea class="form-control" th:field="*{description}"
+                                                              name="description" id="description" required
+                                                    ></textarea>
+                                                </label>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Đóng
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">Thêm</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End Modal Add
+                        !                        <nav aria-label="Page navigation example"> -->
+                        <!--                            <ul class="pagination">-->
+                        <!--                                <li th:if="${pageConfig.getPage()>1}"-->
+                        <!--                                    class="page-item"><a-->
+                        <!--                                        class="page-link"-->
+                        <!--                                        th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() -1})}">Previous</a>-->
+                        <!--                                </li>-->
+                        <!--                                <li class="page-item"><a class="page-link" href="#"-->
+                        <!--                                                         th:text="${pageConfig.getPage()}"></a></li>-->
+                        <!--                                <li th:if="${pageConfig.getPage() < pageConfig.getTotalPage()}" class="page-item">-->
+                        <!--                                    <a-->
+                        <!--                                            class="page-link"-->
+                        <!--                                            th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() +1})}">Next</a>-->
+                        <!--                                </li>-->
+                        <!--                            </ul>-->
+                        <!--                        </nav>-->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+        <!--    <footer th:replace="admin/fragments :: footer" class="py-4 bg-light mt-auto">-->
+
+        <!--    </footer>-->
+    </div>
+</div>
+<script th:src="@{/admin1/js/JQuery3.3.1.js}"></script>
+<script th:src="@{'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'}"
+        crossorigin="anonymous"></script>
+<script th:src="@{/admin1/js/scripts.js}"></script>
+<script th:src="@{'https://cdn.jsdelivr.net/npm/simple-datatables@latest'}" crossorigin="anonymous"></script>
+</body>
+
+</html>
