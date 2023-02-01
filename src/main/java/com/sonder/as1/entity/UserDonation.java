@@ -19,10 +19,10 @@ public class UserDonation {
     private Integer status = 0;
     @Column(columnDefinition = "TEXT NULL")
     private String text;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "donation_id")
     private Donation donation;
 

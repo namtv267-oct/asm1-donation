@@ -43,14 +43,13 @@ public class UserService implements EntityService<User> {
 
     public ModelDto<User> getAllByUsernameOrPhoneNumber(int page, int size, String data) {
         int offset = page * size;
-
-        StringBuilder stringBuilder = new StringBuilder("%$%");
-        stringBuilder.replace(1, 2, data);
-        int totalPage = userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString())/size;
-        userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString(), size, offset);
+        StringBuilder $ = new StringBuilder("%");
+        $.append(data);
+        $.append("%");
+        int totalPage = userRepository.findByUsernameOrPhoneNumber(data)/size;
         return new ModelDto<>("Thành công"
                 , "Danh sách người dùng"
-                , userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString(), size, offset), page, size, totalPage);
+                , userRepository.findByUsernameOrPhoneNumber($.toString(), size, offset), page, size, totalPage);
 
     }
     @Override
