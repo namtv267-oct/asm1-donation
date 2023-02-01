@@ -12,20 +12,25 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @NotNull
     @Column(columnDefinition = "TEXT NULL")
     private String address;
     @Column(unique = true)
-    @Email
+    @Email(message = "Email không hợp lệ")
+    @NotBlank
     private String email;
-    @Size(min = 5)
+    @NotNull
     private String fullName;
     @Column(columnDefinition = "TEXT NULL")
     private String note;
+    @Size(min = 8,max = 32,message = "Mật khẩu phải nhiều hơn 8 ký tự, nhỏ hơn 32 ký tự")
+    @NotBlank
     private String password;
-    @Size(min = 8, max = 12)
+    @Size(min = 8, max = 12,message = "Số điện thoại lớn hơn 8 và nhỏ hơn 12")
     private String phoneNumber;
     private Integer status = 1;
     @Column(unique = true)
+    @NotBlank(message = "Không được để trống và ký tự khoảng trắng")
     private String username;
     private LocalDate created = LocalDate.now();
     private String role = "USER";

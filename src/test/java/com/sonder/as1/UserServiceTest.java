@@ -18,7 +18,7 @@ public class UserServiceTest {
 
     @Test
     public void findAllUser_test(){
-        System.out.println(userService.getAll(1,1).getTotalPage());
+        System.out.println(userService.getAll(1,1));
     }
 
 

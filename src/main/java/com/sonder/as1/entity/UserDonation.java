@@ -1,6 +1,7 @@
 package com.sonder.as1.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -12,9 +13,10 @@ public class UserDonation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private LocalDate created = LocalDate.now();
-    private Long money = 0L;
+    @Positive
+    private Long money;
     private String name = "unknown";
-    private Integer status = 1;
+    private Integer status = 0;
     @Column(columnDefinition = "TEXT NULL")
     private String text;
     @ManyToOne

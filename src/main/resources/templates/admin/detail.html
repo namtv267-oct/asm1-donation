@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="vn" xmlns:th="http://www.thymeleaf.org">
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head th:replace="~{/admin/home::admin-header(~{::title})}">
     <title>Admin Details</title>
 </head>
-
 <body class="sb-nav-fixed">
 <nav th:replace="~{/admin/home::navBar}"></nav>
 <div id="layoutSidenav">
@@ -20,7 +19,7 @@
                                 <label for="addname"
                                        class="col-form-label">Mã đợt quyên góp:</label>
                                 <input type="text" class="form-control"
-                                       id="addname" name="code" th:value="${donation.getCode()}"  readonly="readonly">
+                                       id="addname" name="code" th:value="${donation.code}" readonly="readonly">
                             </div>
                             <div class="col-6">
                                 <label for="addcost"
@@ -34,7 +33,8 @@
                                 <label for="start-date"
                                        class="col-form-label">Ngày bắt đầu:</label>
                                 <input type="date" class="form-control"
-                                       id="start-date" name="start" th:value="${donation.startDate}" readonly="readonly">
+                                       id="start-date" name="start" th:value="${donation.startDate}"
+                                       readonly="readonly">
                             </div>
                             <div class="col-6">
                                 <label for="end-date"
@@ -48,18 +48,20 @@
                                 <label for="money"
                                        class="col-form-label">Tổng tiền quyên góp:</label>
                                 <input type="text" class="form-control"
-                                       id="money" name="start" th:value="${donation.money}" readonly="readonly">
+                                       id="money" name="start"
+                                       th:placeholder="${donation.money == null ? '0' :donation.money}  + ' VND'"
+                                       readonly="readonly">
                             </div>
                             <div class="col-6">
                                 <label for="status"
                                        class="col-form-label">Trạng thái:</label>
-                                <input type="text" class="form-control"
+                                <input th:if="${donation.status == 1}" type="text" class="form-control"
                                        id="status" name="end" value="Mới tạo" readonly="readonly">
-                                <input type="text" class="form-control"
+                                <input th:if="${donation.status == 2}" type="text" class="form-control"
                                        id="status" name="end" value="Đang quyên góp" readonly="readonly">
-                                <input type="text" class="form-control"
+                                <input th:if="${donation.status == 0}" type="text" class="form-control"
                                        id="status" name="end" value="Kết thúc quyên góp" readonly="readonly">
-                                <input type="text" class="form-control"
+                                <input th:if="${donation.status == 3}" type="text" class="form-control"
                                        id="status" name="end" value="Đóng quyên góp" readonly="readonly">
                             </div>
                         </div>
@@ -68,24 +70,27 @@
                                 <label for="organizationName"
                                        class="col-form-label">Tổ chức:</label>
                                 <input type="text" class="form-control"
-                                       id="organizationName" name="tochuc" th:value="${donation.organizationName}" readonly="readonly">
+                                       id="organizationName" name="tochuc" th:placeholder="${donation.organizationName}"
+                                       readonly="readonly">
                             </div>
                             <div class="col-6">
                                 <label for="phoneNumber"
                                        class="col-form-label">Số điện thoại:</label>
                                 <input type="number" class="form-control"
-                                       id="phoneNumber" name="sdt" th:value="${donation.phoneNumber}" readonly="readonly">
+                                       id="phoneNumber" name="sdt" th:placeholder="${donation.phoneNumber}"
+                                       readonly="readonly">
                             </div>
                             <div class="col-12">
                                 <label for="description" class="col-form-label">Nội dung:</label>
-                                <textarea id="description" name="noidung" class="form-control" cols="50" readonly="readonly" th:value="${donation.description}"></textarea>
+                                <textarea id="description" name="noidung" class="form-control" cols="50"
+                                          readonly="readonly" th:placeholder="${donation.description}"></textarea>
                             </div>
                         </div>
                         <!--Detail-->
                         <h3 class="mt-4">Danh sách những người quyên góp</h3>
-                        <table id="datatablesSimple">
+                        <table id="datatablesSimple" class="table">
                             <thead>
-                            <tr style="background-color: gray !important;">
+                            <tr>
                                 <th>Họ Tên</th>
                                 <th>Tiền quyên góp</th>
                                 <th>Ngày quyên góp</th>
@@ -94,31 +99,80 @@
                                 <th>Hành động</th>
                             </tr>
                             </thead>
-                            <tfoot>
-                            <tr>
-
-                            </tr>
-                            </tfoot>
-                            <tbody>
-                            <!--                            <input type="hidden" th:value="${userDonationList.size()}" id="dodai"/>-->
-                            <th>
+                            <th:block th:each="userdonation : ${userDonations.getData()}">
+                                <tbody>
                                 <tr>
-                                    <td>Minh Khương</td>
-                                    <td>20000</td>
-                                    <td>10/10/2023</td>
-                                    <td>Quyên góp</td>
-                                    <td>Chờ xác nhận</td>
-                                    <td style="display: flex;justify-content: space-between">
-
-                                        <button type="submit" style="width: 105px" class="btn btn-success">
+                                    <td th:text="${userdonation.getName()}">Minh Khương</td>
+                                    <td th:text="${userdonation.getMoney()}">20000</td>
+                                    <td th:text="${userdonation.getCreated()}">10/10/2023</td>
+                                    <td th:text="${userdonation.getText()}">Quyên góp</td>
+                                    <td th:text="${userdonation.getStatus() == 0 ? 'Chưa xác nhận':'Đã xác nhận'}">Chờ
+                                        xác nhận
+                                    </td>
+                                    <td style="display: flex;justify-content: left">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                th:data-bs-target="'#confirmModal'+${userdonation.id}"
+                                        th:if="${userdonation.status == 0}">
                                             Xác nhận
                                         </button>
-                                        <button type="submit" style="width: 150px" class="btn btn-danger">
-                                            Hủy xác nhận
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                th:data-bs-target="'#un-confirmModal'+${userdonation.id}">
+                                            Hủy ủng hộ
+                                        </button>
                                     </td>
+
                                 </tr>
-                            </th>
-                            </tbody>
+                                </tbody>
+                                <!--                                Modal xac nhan-->
+                                <div class="modal fade" th:id="'confirmModal'+${userdonation.id}" tabindex="-1"
+                                     aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmModalLabel" th:text="'Xac nhan ung ho: ' +${userdonation.id}">Xác nhận ủng hộ</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form th:action="@{/admin/donation/confirm/{id}(id = ${donation.id})}"
+                                                      method="post">
+                                                    <input type="hidden" name="idUserDonation"
+                                                           th:value="${userdonation.id}"/>
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Đóng
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--                                Huy xac nhan-->
+                                <div class="modal fade" th:id="'un-confirmModal'+${userdonation.id}" tabindex="-1"
+                                     aria-labelledby="un-confirmModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="un-confirmModalLabel" th:text="'Huy ung ho: ' + ${userdonation.id}">Xác nhận hủy ủng
+                                                    hộ</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form th:action="@{/admin/donation/un-confirm/{id}(id = ${donation.id})}"
+                                                      method="post">
+                                                    <input type="hidden" name="idUserDonation"
+                                                           th:value="${userdonation.id}"/>
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Đóng
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">Hủy ủng hộ</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
                         </table>
                     </div>
                 </div>
@@ -126,7 +180,6 @@
         </main>
         <footer class="py-4 bg-light mt-auto">
             <div class="container-fluid px-4">
-
             </div>
         </footer>
     </div>
@@ -137,5 +190,4 @@
 <script th:src="@{/admin1/js/scripts.js}"></script>
 <script th:src="@{'https://cdn.jsdelivr.net/npm/simple-datatables@latest'}" crossorigin="anonymous"></script>
 </body>
-
 </html>

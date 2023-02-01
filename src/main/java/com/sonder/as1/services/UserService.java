@@ -1,6 +1,6 @@
 package com.sonder.as1.services;
 
-import com.sonder.as1.entity.PageC;
+import com.sonder.as1.dto.ModelDto;
 import com.sonder.as1.entity.User;
 import com.sonder.as1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,35 +12,46 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements EntityService<User> {
     private final UserRepository userRepository;
 
     @Autowired
-    public UserService( UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public void setLock(Integer id){
-        userRepository.setState(0,id);
+    public void setLock(Integer id) {
+        userRepository.setState(0, id);
     }
-    public void setUnLock(Integer id){
-        userRepository.setState(1,id);
+
+    public void setUnLock(Integer id) {
+        userRepository.setState(1, id);
     }
+
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    public PageC<User> getAll(int page, int size) {
-        PageC<User> userPageC = new PageC<>();
-        Page<User> userPage = userRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
-        userPageC.setPage(page);
-        userPageC.setSize(size);
-        userPageC.setTotalPage(userPage.getTotalPages());
-        userPageC.setTs(userPage.stream().toList());
-        return userPageC;
+    public ModelDto<User> getAll(int page, int size) {
+        Page<User> userPage = userRepository.findAll(PageRequest.of(page - 1, size));
+        return new ModelDto<User>("Thành công", "Danh sách người dùng", userPage.stream().toList(), page, size, userPage.getTotalPages());
+    }
+
+    public ModelDto<User> getAllByUsernameOrPhoneNumber(int page, int size, String data) {
+        int offset = page * size;
+
+        StringBuilder stringBuilder = new StringBuilder("%$%");
+        stringBuilder.replace(1, 2, data);
+        int totalPage = userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString())/size;
+        userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString(), size, offset);
+        return new ModelDto<>("Thành công"
+                , "Danh sách người dùng"
+                , userRepository.findByUsernameOrPhoneNumber(stringBuilder.toString(), size, offset), page, size, totalPage);
+
     }
     @Override
     public void createEntity(User user) {
@@ -49,8 +60,9 @@ public class UserService implements EntityService<User> {
 
     @Override
     public void updateEntity(User user, Integer id) {
-            userRepository.save(user);
-        }
+        userRepository.save(user);
+    }
+
     @Override
     public User getById(Integer id) {
         Optional<User> userOptional = userRepository.findById(id);

@@ -29,6 +29,15 @@
                                     <option>7</option>
                                 </select>
                             </label>
+                            <label class="col-form-label" for="search_donation">
+                                <select name="filter" id="search_donation">
+                                    <option value="" selected> Chọn bộ lọc</option>
+                                    <option value="0">Đóng quyên góp</option>
+                                    <option value="1">Mới tạo</option>
+                                    <option value="2">Đang quyên góp</option>
+                                    <option value="3">Dừng quyên góp</option>
+                                </select>
+                            </label>
                             <button class="btn btn-success my-3" type="submit">Set</button>
                         </form>
                         <table id="datatablesSimple" class="table">
@@ -50,7 +59,7 @@
                             </tr>
                             </tfoot>
                             <tbody>
-                            <th:block th:each="donation : ${donations}">
+                            <th:block th:each="donation : ${modelDonation.getData()}">
                                 <tr>
                                     <td th:text="${donation.code}"></td>
                                     <td th:text="${donation.name}"></td>
@@ -59,35 +68,62 @@
                                     <td th:text="${donation.organizationName}"></td>
                                     <td th:text="${donation.phoneNumber}"></td>
                                     <td th:text="${donation.money == null ? 0 : donation.money}"></td>
-                                    <td th:value="${donation.status == 1 ? 'Quyên góp' : 'Dừng quên góp'}"
-                                        style="color: green;font-weight: bold">Hoạt động
+                                    <td>
+                                        <span th:if="${donation.status == 0 }"
+                                              style="color: green;font-weight: bold"
+                                        >Kết thúc quyên góp
+                                        </span>
+                                        <span th:if="${donation.status == 1}"
+                                              style="color: green;font-weight: bold"
+                                        >Mới tạo
+                                        </span>
+                                        <span th:if="${donation.status == 2}"
+                                              style="color: green;font-weight: bold"
+                                        >Đang quyên góp
+                                        </span>
+                                        <span th:if="${donation.status == 3}"
+                                              style="color: green;font-weight: bold"
+                                        >Đóng quyên góp
+                                    </span>
                                     </td>
                                     <td style="width : 270px">
-                                        <button type="button" style="width: 80px" class="btn btn-primary"
+
+                                        <a
+                                                type="button" style="width: 80px" class="btn btn-warning"
+                                                th:href="@{/admin/donation/detail/{id}(id=${donation.id})}">
+                                            Chi tiết
+                                        </a>
+                                        <button th:if="${donation.status == 2}"
+                                                type="button" style="width: 80px" class="btn btn-primary"
                                                 data-bs-toggle="modal"
                                                 th:data-bs-target="'#exampleModal'+${donation.id}">
                                             Cập nhật
                                         </button>
-                                        <a type="button" style="width: 80px" class="btn btn-warning"
-                                           th:href="@{/admin/donation/detail/{id}(id=${donation.id})}">
-                                            Chi tiết
-                                        </a>
-                                        <button type="button" style="width: 80px" class="btn btn-danger"
+                                        <button th:if="${donation.status == 1 || donation.status == 3|| donation.status == 0}  "
+                                                type="button" style="width: 80px" class="btn btn-danger"
                                                 data-bs-toggle="modal"
                                                 th:data-bs-target="'#idModelDel'+${donation.id}">
                                             Xóa
                                         </button>
-                                        <form th:action="@{/admin/donation/lock/{id}(id=${donation.id})}"
+                                        <form th:if="${donation.status == 1 || donation.status == 3}"
+                                              th:action="@{/admin/donation/starting/{id}(id=${donation.id})}"
                                               method="post">
                                             <button type="submit" style="width: 80px" class="btn btn-danger">
                                                 Quyên góp
                                             </button>
                                         </form>
-                                        <form
-                                                th:action="@{/admin/account/un-lock/{id}(id=${donation.id})}"
-                                                method="post">
+                                        <form th:if="${donation.status == 2}"
+                                              th:action="@{/admin/donation/ended/{id}(id=${donation.id})}"
+                                              method="post">
                                             <button type="submit" style="width: 80px" class="btn btn-success">
                                                 Kết thúc
+                                            </button>
+                                        </form>
+                                        <form th:if="${donation.status == 2}"
+                                              th:action="@{/admin/donation/close/{id}(id=${donation.id})}"
+                                              method="post">
+                                            <button type="submit" style="width: 80px" class="btn btn-success">
+                                                Đóng
                                             </button>
                                         </form>
                                         <!--                                        <div class="modal fade" th:id="'idModelDetail' + ${donation.id}" tabindex="-1"-->
@@ -261,7 +297,6 @@
                                                     </div>
                                                 </form>
                                             </div>
-                                            <!--                                            -->
                                         </div>
                                     </div>
                                 </div>
@@ -269,6 +304,29 @@
                             </th:block>
                             </tbody>
                         </table>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li th:if="${modelDonation.getPage()>1}"
+                                    class="page-item">
+                                    <a  th:if="${param.get('filter') == null}"
+                                        class="page-link"
+                                        th:href="@{/admin/donation(size=${modelDonation.getSize()},page=${modelDonation.getPage() -1})}">Previous</a>
+                                    <a  th:if="${param.get('filter') != null}"
+                                            class="page-link"
+                                            th:href="@{/admin/donation(size=${modelDonation.getSize()},page=${modelDonation.getPage() -1},filter=${param.get('filter')})}">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#"
+                                                         th:text="${modelDonation.getPage()}"></a></li>
+                                <li th:if="${modelDonation.getPage() < modelDonation.getTotalPage()}" class="page-item">
+                                    <a      th:if="${param.get('filter') == null}"
+                                            class="page-link"
+                                            th:href="@{/admin/donation(size=${modelDonation.getSize()},page=${modelDonation.getPage() +1})}">Next</a>
+                                    <a      th:if="${param.get('filter')!= null}"
+                                            class="page-link"
+                                            th:href="@{/admin/donation(size=${modelDonation.getSize()},page=${modelDonation.getPage() +1},filter=${param.get('filter')})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                         <!-- Modal Add-->
                         <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
                              aria-hidden="true">

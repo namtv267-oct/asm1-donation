@@ -1,5 +1,6 @@
 package com.sonder.as1.services;
 
+import com.sonder.as1.dto.ModelDto;
 import com.sonder.as1.entity.UserDonation;
 import com.sonder.as1.repositories.UserDonationRepo;
 import jakarta.validation.constraints.Size;
@@ -39,7 +40,9 @@ public class UserDonationService implements EntityService<UserDonation>{
     public void updateEntity(UserDonation userDonation, Integer id) {
 
     }
-
+    public ModelDto<UserDonation> getUserDonationByDonationId(Integer id){
+        return new ModelDto<>("","",userDonationRepo.findUserDonationByDonationId(id),0,0,0);
+    }
     @Override
     public UserDonation getById(Integer id) {
         return null;
@@ -48,5 +51,11 @@ public class UserDonationService implements EntityService<UserDonation>{
     @Override
     public void deleteEntity(Integer id) {
 
+    }
+    public void setConfirm(Integer id){
+        userDonationRepo.setStateStatus(1,id);
+    }
+    public void setUnConfirm(Integer id){
+        userDonationRepo.setStateStatus(0,id);
     }
 }

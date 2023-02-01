@@ -11,99 +11,14 @@
         <main>
             <div class="container-fluid px-4">
                 <h1 class="mt-4">Danh sách người dùng</h1>
+                <h2 th:if="${param.get('sucess') != null }">Thêm người dùng thành công</h2>
+                <h2 th:if="${param.get('error') != null }">Thêm người dùng thất bại</h2>
                 <div class="card mb-4">
                     <div class="card-header">
                         <button type="button" class="btn btn-success" data-bs-toggle="modal"
                                 data-bs-target="#exampleModalAdd">
                             Thêm mới
                         </button>
-                        <p th:if="${param.error!= null}">Thêm người dùng lỗi</p>
-                        <p th:if="${param.success!= null}">Thêm người dùng thành công</p>
-                        <!-- Modal Add-->
-                        <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Thêm mới</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form th:action="@{/admin/account/create}" th:object="${user}" method="post"
-                                              enctype="multipart/form-data">
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <label for="fullname"
-                                                           class="col-form-label">Name:</label>
-                                                    <input type="text" class="form-control"
-                                                           id="fullname" th:field="*{fullName}" required>
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="email"
-                                                           class="col-form-label">Email:</label>
-                                                    <input type="email" class="form-control"
-                                                           id="email" th:field="*{email}" required>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <label for="addphone"
-                                                           class="col-form-label">Số điện thoại:</label>
-                                                    <input type="text" class="form-control"
-                                                           id="addphone" th:field="*{phoneNumber}" name="phoneNumber"
-                                                           required>
-                                                    <p th:if="${#fields.hasErrors('phoneNumber')}"></p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="address"
-                                                           class="col-form-label">Địa chỉ:</label>
-                                                    <input type="text" class="form-control"
-                                                           id="address" th:field="*{address}" name="address" required>
-                                                    <p th:if="${#fields.hasErrors('address')}"></p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <label for="username"
-                                                           class="col-form-label">Tài khoản:</label>
-                                                    <input type="text" class="form-control"
-                                                           id="username" th:field="*{username}" name="username"
-                                                           required>
-                                                    <p th:if="${#fields.hasErrors('username')}"></p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="password"
-                                                           class="col-form-label">Mật khẩu:</label>
-                                                    <input type="text" class="form-control"
-                                                           id="password" th:field="*{password}" name="password"
-                                                           required>
-                                                    <p th:if="${#fields.hasErrors('password')}"></p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="role" class="col-form-label">Vai trò:
-                                                        <select
-                                                                class="form-control" id="role" th:field="*{role}"
-                                                                required>
-                                                            <option value="ADMIN">ADMIN</option>
-                                                            <option value="USER">USER</option>
-                                                        </select>
-                                                    </label>
-
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    Đóng
-                                                </button>
-                                                <button type="submit" class="btn btn-primary">Thêm</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--End Modal Add-->
                     </div>
                     <div class="card-body">
                         <form th:action="@{/admin/account}" method="get">
@@ -111,12 +26,16 @@
                                 Số lượng mỗi trang:
                                 <select name="size" id="size">
                                     <option value="5" selected>Chọn số lượng</option>
-                                    <option >3</option>
-                                    <option >5</option>
-                                    <option >7</option>
+                                    <option>3</option>
+                                    <option>5</option>
+                                    <option>7</option>
                                 </select>
                             </label>
-                            <button class="btn btn-success my-3" type="submit">Set</button>
+                            <label for="search" class="col-form-label">
+                                <input type="text" name="p" id="search"/>
+                            </label>
+                            <button class="btn btn-success my-3" type="submit">Cài đặt
+                            </button>
                         </form>
                         <table id="datatablesSimple" class="table">
                             <thead>
@@ -133,11 +52,10 @@
                             </thead>
                             <tfoot>
                             <tr>
-
                             </tr>
                             </tfoot>
                             <tbody>
-                            <th:block th:each="user : ${pageConfig.ts}">
+                            <th:block th:each="user : ${modelUser.getData()}">
                                 <tr>
                                     <td th:text="${user.fullName}"></td>
                                     <td th:text="${user.email}"></td>
@@ -169,13 +87,15 @@
                                                 th:data-bs-target="'#idModelDel'+${user.id}">
                                             Xóa
                                         </button>
-                                        <form th:if="${user.status == 1}" th:action="@{/admin/account/lock/{id}(id=${user.id})}" method="post"
+                                        <form th:if="${user.status == 1}"
+                                              th:action="@{/admin/account/lock/{id}(id=${user.id})}" method="post"
                                               style="margin-left: 85px;margin-top: -38px">
                                             <button type="submit" style="width: 80px" class="btn btn-danger">
                                                 Khóa
                                             </button>
                                         </form>
-                                        <form th:if="${user.status == 0}" th:action="@{/admin/account/un-lock/{id}(id=${user.id})}" method="post">
+                                        <form th:if="${user.status == 0}"
+                                              th:action="@{/admin/account/un-lock/{id}(id=${user.id})}" method="post">
                                             <button type="submit" style="width: 80px" class="btn btn-success">
                                                 Mở
                                             </button>
@@ -185,14 +105,16 @@
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Bạn chắc chắn
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Bạn
+                                                            chắc chắn
                                                             muốn xóa ?</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         Người dùng : <span th:text="${user.fullName}"></span>
-                                                        <form th:action="@{/admin/account/delete/{id}(id=${user.id})}" method="post">
+                                                        <form th:action="@{/admin/account/delete/{id}(id=${user.id})}"
+                                                              method="post">
                                                             <div class="modal-footer" style="margin-top: 20px">
                                                                 <button type="button" class="btn btn-secondary"
                                                                         data-bs-dismiss="modal">Đóng
@@ -211,8 +133,9 @@
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Gửi đến: <span
-                                                                th:text="${user.email}"></span></h5>
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Gửi
+                                                            đến: <span
+                                                                    th:text="${user.email}"></span></h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                     </div>
@@ -242,8 +165,9 @@
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Chi tiết : <span
-                                                                th:text="${user.fullName}"></span></h5>
+                                                        <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Chi
+                                                            tiết : <span
+                                                                    th:text="${user.fullName}"></span></h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                     </div>
@@ -278,7 +202,8 @@
                                     <div class="modal-dialog modal-lg ">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Cập nhật</h5>
+                                                <h5 class="modal-title" th:id="exampleModalLabel+${user.id}">Cập
+                                                    nhật</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                             </div>
@@ -341,17 +266,17 @@
                                                             <input readonly type="text" class="form-control"
                                                                    id="add-name1" name="username" required
                                                                    th:placeholder="Username+':'+${user.username}"
-                                                                    th:value="${user.username}">
+                                                                   th:value="${user.username}">
                                                             <label for="add-name2"
                                                                    class="col-form-label">Mật khẩu:</label>
                                                             <input
-                                                                   type="text"
-                                                                   class="form-control"
-                                                                   id="add-name2"
-                                                                   name="password"
-                                                                   required
-                                                                   th:placeholder="Password+':'+${user.password}"
-                                                                   th:value="${user.password}">
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    id="add-name2"
+                                                                    name="password"
+                                                                    required
+                                                                    th:placeholder="Password+':'+${user.password}"
+                                                                    th:value="${user.password}">
                                                         </div>
                                                         <div class="col-6">
                                                             <label for="ct_id" class="col-form-label">Vai trò:</label>
@@ -381,17 +306,24 @@
                         </table>
                         <nav aria-label="Page navigation example">
                             <ul class="pagination">
-                                <li th:if="${pageConfig.getPage()>1}"
-                                    class="page-item"><a
-                                        class="page-link"
-                                        th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() -1})}">Previous</a>
+                                <li th:if="${modelUser.getPage()>1}"
+                                    class="page-item">
+                                    <a th:if="${param.get('p') != null}"
+                                       class="page-link"
+                                       th:href="@{/admin/account(size=${modelUser.getSize()},page=${modelUser.getPage() -1},p=${param.get('p')})}">Previous</a>
+                                    <a th:if="${param.get('p') == null}"
+                                       class="page-link"
+                                       th:href="@{/admin/account(size=${modelUser.getSize()},page=${modelUser.getPage() -1})}">Previous</a>
                                 </li>
-                                <li class="page-item"><a class="page-link" href="#"
-                                                         th:text="${pageConfig.getPage()}"></a></li>
-                                <li th:if="${pageConfig.getPage() < pageConfig.getTotalPage()}" class="page-item">
-                                    <a
-                                            class="page-link"
-                                            th:href="@{/admin/account(size=${pageConfig.getSize()},page=${pageConfig.getPage() +1})}">Next</a>
+                                <li class="page-item"><span class="page-link"
+                                                            th:text="${modelUser.getPage()}"></span></li>
+                                <li th:if="${modelUser.getPage() < modelUser.getTotalPage()}" class="page-item">
+                                    <a th:if="${param.get('p') == null}"
+                                       class="page-link"
+                                       th:href="@{/admin/account(size=${modelUser.getSize()},page=${modelUser.getPage() +1},p=${param.get('p')})}">Next</a>
+                                    <a th:if="${param.get('p') != null}"
+                                       class="page-link"
+                                       th:href="@{/admin/account(size=${modelUser.getSize()},page=${modelUser.getPage() +1},p=${param.get('p')})}">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -399,11 +331,99 @@
                 </div>
             </div>
         </main>
+        <!-- Modal Add-->
+        <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Thêm mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form th:action="@{/admin/account/create}" th:object="${user}" method="post"
+                              enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="fullname"
+                                           class="col-form-label">Name:</label>
+                                    <input type="text" class="form-control"
+                                           id="fullname" th:field="*{fullName}" required>
+                                </div>
+                                <div class="col-6">
+                                    <label for="email"
+                                           class="col-form-label">Email:</label>
+                                    <input type="email" class="form-control"
+                                           id="email" th:field="*{email}" required placeholder="abcd@email.com">
+                                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="addphone"
+                                           class="col-form-label">Số điện thoại:</label>
+                                    <input type="text" class="form-control"
+                                           id="addphone" th:field="*{phoneNumber}" name="phoneNumber"
+                                           required placeholder="Từ 8 - 12 số">
+                                    <p th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></p>
+                                </div>
+                                <div class="col-6">
+                                    <label for="address"
+                                           class="col-form-label">Địa chỉ:</label>
+                                    <input type="text" class="form-control"
+                                           id="address" th:field="*{address}" name="address" required>
+                                    <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="username"
+                                           class="col-form-label">Tài khoản:</label>
+                                    <input type="text" class="form-control"
+                                           id="username" th:field="*{username}" name="username"
+                                           required placeholder="Không có khoảng trắng và ký tự đặc biệt">
+                                    <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                                </div>
+                                <div class="col-6">
+                                    <label for="password"
+                                           class="col-form-label">Mật khẩu:</label>
+                                    <input type="text" class="form-control"
+                                           id="password" th:field="*{password}" name="password"
+                                           required
+                                           placeholder="Từ 8 đến 12 ký tự, không có khoảng trắng và ký tự đặc biệt">
+                                    <p th:if="${#fields.hasErrors('password')}"></p>
+                                </div>
+                                <div class="col-6">
+                                    <label for="role" class="col-form-label">Vai trò:
+                                        <select
+                                                class="form-control" id="role" th:field="*{role}"
+                                                required>
+                                            <option value="ADMIN">ADMIN</option>
+                                            <option value="USER">USER</option>
+                                        </select>
+                                    </label>
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Đóng
+                                </button>
+                                <button type="submit" class="btn btn-primary">Thêm</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End Modal Add-->
         <!--    <footer th:replace="admin/fragments :: footer" class="py-4 bg-light mt-auto">-->
         <!--    </footer>-->
     </div>
 </div>
-
+<script>
+</script>
 <script th:src="@{/admin1/js/JQuery3.3.1.js}"></script>
 <script th:src="@{'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'}"
         crossorigin="anonymous"></script>

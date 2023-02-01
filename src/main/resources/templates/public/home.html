@@ -98,14 +98,16 @@
                 </div>
             </div>
             <ul class="job-listings mb-5">
-                <th:block th:each="donation:${donations}">
-                    <li style="margin-bottom: 20px"
+                <th:block th:each="donation : ${modelDonation.getData()}">
+                    <li
                         class="job-listing d-block d-sm-flex pb-3 pb-sm-0 align-items-center ">
                         <div class="job-listing-about d-sm-flex custom-width w-100 justify-content-between mx-4">
                             <div class="job-listing-position custom-width  mb-3 mb-sm-0"
                                  style="padding: 10px;width: 250px">
                                 <h2 th:text="${donation.name}">Quyên góp mùa lũ</h2>
-                                <strong> Mới tạo</strong>
+                                <strong th:if="${donation.status == 1}"> Mới tạo</strong>
+                                <strong th:if="${donation.status == 2}"> Đang quyên góp</strong>
+                                <strong th:if="${donation.status == 3}"> Dừng quyên góp</strong>
                             </div>
                             <div class="job-listing-location mb-3 mb-sm-0 custom-width w-10" style="padding: 10px;">
                                 Ngày bắt đầu<br>
@@ -121,23 +123,24 @@
                                 <strong th:text="${donation.getPhoneNumber()}"></strong><br>
                             </div>
                             <div class="job-listing-meta custom-width w-20">
-                                <p th:if="${donation.status == 1}" style="margin-top: 20px" class="btn btn-primary py-2"
+                                <p th:if="${donation.status == 2}" style="margin-top: 20px" class="btn btn-primary py-2"
                                    data-toggle="modal" th:data-target="'#modalQuyengop'+${donation.id}">Quyên
                                     góp</p>
-                                <p th:if="${donation.status != 1}"
+                                <p th:if="${donation.status != 2}"
                                    style="margin-top: 20px;background-color: white !important;" class="btn py-2"><span
                                 >Chưa quyên góp</span></p>
                             </div>
                         </div>
-
                     </li>
+
                     <!-- Modal -->
                     <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                          aria-hidden="true" th:id="'modalQuyengop'+${donation.id}">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel" th:text=" 'Quyên góp: ' + ${donation.name}"> <span></span></h5>
+                                    <h5 class="modal-title" id="exampleModalLabel"
+                                        th:text=" 'Quyên góp: ' + ${donation.name}"><span></span></h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -159,7 +162,8 @@
                                                        th:value="${donation.id}"
                                                        name="idDonation"
                                                        id="idDonation">
-                                                <label class="col-form-label" for="idUser">Người dùng quyên góp: </label>
+                                                <label class="col-form-label" for="idUser">Người dùng quyên
+                                                    góp: </label>
                                                 <select class="form-control"
                                                         th:name="idUser" id="idUser">
                                                     <th:block th:each="user:${users}">
@@ -169,8 +173,8 @@
                                                 </select>
                                                 <label for="addname"
                                                        class="col-form-label">Lời nhắn:
-                                                <textarea rows="10" cols="50" class="form-control" name="text"
-                                                          th:field="*{text}">
+                                                    <textarea rows="10" cols="50" class="form-control" name="text"
+                                                              th:field="*{text}">
                                                 </textarea>
                                                 </label>
                                             </div>
@@ -189,20 +193,40 @@
                         </div>
                     </div>
                 </th:block>
-            </ul>
-            <div class="row pagination-wrap">
-                <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">
+                <div class="p-3">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li th:if="${modelDonation.getPage()>1}"
+                                class="page-item"><a
+                                    class="page-link"
+                                    th:href="@{/(page=${modelDonation.getPage() -1})}">Previous</a>
+                            </li>
+                            <li class="page-item"><a class="page-link" href="#"
+                                                     th:text="${modelDonation.getPage()}"></a></li>
+                            <li th:if="${modelDonation.getPage() < modelDonation.getTotalPage()}" class="page-item">
+                                <a
+                                        class="page-link"
+                                        th:href="@{/(page=${modelDonation.getPage() +1})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
 
-                </div>
-                <div class="col-md-6 text-center text-md-right">
-                    <div class="custom-pagination ml-auto">
-                        <a class="prev">Prev</a>
-                        <div class="d-inline-block">
-                        </div>
-                        <a class="next">Next</a>
-                    </div>
-                </div>
-            </div>
+            </ul>
+
+            <!--            <div class="row pagination-wrap">-->
+            <!--                <div class="col-md-6 text-center text-md-left mb-4 mb-md-0">-->
+
+            <!--                </div>-->
+            <!--                <div class="col-md-6 text-center text-md-right">-->
+            <!--                    <div class="custom-pagination ml-auto">-->
+            <!--                        <a class="prev">Prev</a>-->
+            <!--                        <div class="d-inline-block">-->
+            <!--                        </div>-->
+            <!--                        <a class="next">Next</a>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
         </div>
     </section>
 </div>

@@ -1,7 +1,12 @@
 package com.sonder.as1.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 
+import java.sql.Date;
 import java.util.Collection;
 
 @Entity(name = "Donation")
@@ -13,12 +18,16 @@ public class Donation {
     private String code;
     @Column(columnDefinition = "TEXT NULL")
     private String description;
-    private String endDate;
+    @PastOrPresent
+    private Date startDate;
+    @FutureOrPresent
+    private Date endDate;
     private String name;
     private Long money = 0L;
+    @NotNull
     private String organizationName;
+
     private String phoneNumber;
-    private String startDate;
     private Integer status = 1;
     @OneToMany(mappedBy = "donation",cascade = CascadeType.ALL)
     private Collection<UserDonation> userDonations;
@@ -26,15 +35,15 @@ public class Donation {
     public Donation() {
     }
 
-    public Donation(String code, String description, String endDate, String name, Long money, String organizationName, String phoneNumber, String startDate, Integer status, Collection<UserDonation> userDonations) {
+    public Donation(String code, String description, Date startDate, Date endDate, String name, Long money, String organizationName, String phoneNumber, Integer status, Collection<UserDonation> userDonations) {
         this.code = code;
         this.description = description;
+        this.startDate = startDate;
         this.endDate = endDate;
         this.name = name;
         this.money = money;
         this.organizationName = organizationName;
         this.phoneNumber = phoneNumber;
-        this.startDate = startDate;
         this.status = status;
         this.userDonations = userDonations;
     }
@@ -63,11 +72,19 @@ public class Donation {
         this.description = description;
     }
 
-    public String getEndDate() {
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -101,14 +118,6 @@ public class Donation {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
     }
 
     public Integer getStatus() {
