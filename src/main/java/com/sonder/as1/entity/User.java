@@ -12,45 +12,41 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @NotNull
-    @Column(columnDefinition = "TEXT NULL")
-    private String address;
     @Column(unique = true)
     @Email(message = "Email không hợp lệ")
     @NotBlank
     private String email;
+    @Size(min = 8,message = "Mật khẩu phải nhiều hơn 8 ký tự")
+    @NotBlank
+    private String password;
+    @Enumerated(EnumType.STRING)
+    private ERole role = ERole.ROLE_USER;
     @NotNull
     private String fullName;
     @Column(columnDefinition = "TEXT NULL")
+    private String address;
+    @Column(columnDefinition = "TEXT NULL")
     private String note;
-    @Size(min = 8,max = 32,message = "Mật khẩu phải nhiều hơn 8 ký tự, nhỏ hơn 32 ký tự")
-    @NotBlank
-    private String password;
     @Size(min = 8, max = 12,message = "Số điện thoại lớn hơn 8 và nhỏ hơn 12")
     private String phoneNumber;
     private Integer status = 1;
-    @Column(unique = true)
-    @NotBlank(message = "Không được để trống và ký tự khoảng trắng")
-    private String username;
     private LocalDate created = LocalDate.now();
-    private String role = "USER";
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private Collection<UserDonation> userDonations;
 
     public User() {
     }
 
-    public User(String address, String email, String fullName, String note, String password, String phoneNumber, Integer status, String username, LocalDate created, String role, Collection<UserDonation> userDonations) {
-        this.address = address;
+    public User(String email, String password, ERole role, String fullName, String address, String note, String phoneNumber, Integer status, LocalDate created, Collection<UserDonation> userDonations) {
         this.email = email;
-        this.fullName = fullName;
-        this.note = note;
         this.password = password;
+        this.role = role;
+        this.fullName = fullName;
+        this.address = address;
+        this.note = note;
         this.phoneNumber = phoneNumber;
         this.status = status;
-        this.username = username;
         this.created = created;
-        this.role = role;
         this.userDonations = userDonations;
     }
 
@@ -62,20 +58,28 @@ public class User {
         this.id = id;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public ERole getRole() {
+        return role;
+    }
+
+    public void setRole(ERole role) {
+        this.role = role;
     }
 
     public String getFullName() {
@@ -86,20 +90,20 @@ public class User {
         this.fullName = fullName;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getNote() {
         return note;
     }
 
     public void setNote(String note) {
         this.note = note;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhoneNumber() {
@@ -118,28 +122,12 @@ public class User {
         this.status = status;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public LocalDate getCreated() {
         return created;
     }
 
     public void setCreated(LocalDate created) {
         this.created = created;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public Collection<UserDonation> getUserDonations() {

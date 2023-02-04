@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer> {
-    Optional<User> findByUsername(String username);
     void deleteById(Integer id);
     @Modifying
     @Transactional
@@ -25,4 +24,5 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     List<User> findByUsernameOrPhoneNumber(@Param("data") String data,@Param("count") Integer size, @Param("offset") Integer offset);
     @Query(value = "select count(*) from users u where u.full_name like :data or u.phone_number like :data",nativeQuery = true)
     Integer findByUsernameOrPhoneNumber(@Param("data") String data);
+    Optional<User> findUserByEmail(String email);
 }

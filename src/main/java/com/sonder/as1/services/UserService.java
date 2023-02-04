@@ -6,21 +6,21 @@ import com.sonder.as1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements EntityService<User> {
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void setLock(Integer id) {
@@ -54,6 +54,8 @@ public class UserService implements EntityService<User> {
     }
     @Override
     public void createEntity(User user) {
+        String $u = user.getPassword();
+        user.setPassword(passwordEncoder.encode($u));
         userRepository.save(user);
     }
 
